@@ -1,31 +1,25 @@
 version: '3'
-volumes:
-  postgres_data:
-      driver: local
+
+networks:
+  core-infra:
+    external: true
+
 services:
-  postgres:
-      image: postgres
-      ports:
-        - "5432:5432"
-      volumes:
-        - postgres_data:/var/lib/postgresql/data
-      environment:
-        POSTGRES_DB: keycloak
-        POSTGRES_USER: keycloak
-        POSTGRES_PASSWORD: password
   keycloak:
-      image: jboss/keycloak
+      image: fnext/keycloak:0.0.1
       environment:
-        DB_VENDOR: POSTGRES
-        DB_ADDR: postgres
-        DB_DATABASE: keycloak
-        DB_USER: keycloak
-        DB_PASSWORD: password
+        DB_VENDOR: h2
         KEYCLOAK_USER: admin
         KEYCLOAK_PASSWORD: Pa55w0rd
-        # Uncomment the line below if you want to specify JDBC parameters. The parameter below is just an example, and it shouldn't be used in production without knowledge. It is highly recommended that you read the PostgreSQL JDBC driver documentation in order to use it.
-        #JDBC_PARAMS: "ssl=true"
+      volumes:
+        - /nfs/docker/keycloak/data:/opt/jboss/keycloak/standalone/data
+      networks:
+       - core-infra
       ports:
-        - 8080:8080
-      depends_on:
-        - postgres
+        - 8081:8080
+      deploy:
+        mode: replicated
+        replicas: 1
+        placement:
+          constraints:
+            - "node.hostname == fnext-padellion"
