@@ -10,7 +10,7 @@ services:
       environment:
         DB_VENDOR: h2
         KEYCLOAK_USER: admin
-        KEYCLOAK_PASSWORD: Pa55w0rd
+        KEYCLOAK_PASSWORD: xxxxx
       volumes:
         - /nfs/docker/keycloak/data:/opt/jboss/keycloak/standalone/data
       networks:
@@ -23,3 +23,11 @@ services:
         placement:
           constraints:
             - "node.hostname == fnext-padellion"
+        labels:
+          - traefik.enable=true
+          - traefik.docker.network=core-infra
+          - traefik.http.routers.keycloak-https-redirect.tls=true
+          - traefik.http.routers.keycloak-https.entrypoints=idp-secure
+          - traefik.http.routers.keycloak-https.tls=true
+          - traefik.http.services.keycloak-https.loadbalancer.server.port=8080
+          - traefik.http.routers.keycloak-https.rule=Host(`developer.florencenext.com`)
