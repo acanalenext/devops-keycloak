@@ -6,7 +6,7 @@ networks:
 
 services:
   keycloak:
-      image: fnext/keycloak:0.0.1
+      image: jboss/keycloak:15.0.2
       environment:
         DB_VENDOR: h2
         KEYCLOAK_USER: admin
